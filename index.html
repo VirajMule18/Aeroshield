@@ -1,0 +1,2345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AeroShield - AI Pollution Early Warning System</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:
+    radial-gradient(circle at 15% 10%,#123e58 0%,transparent 28%),
+    radial-gradient(circle at 85% 80%,#073b48 0%,transparent 25%),
+    #06111d;
+    color:white;
+    overflow-x:hidden;
+}
+
+body:before,
+body:after{
+    content:"";
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:-1;
+}
+
+body:before{
+    width:450px;
+    height:450px;
+    background:#00d9ff;
+    opacity:.04;
+    filter:blur(100px);
+    top:-150px;
+    left:-150px;
+    animation:float1 9s infinite ease-in-out;
+}
+
+body:after{
+    width:400px;
+    height:400px;
+    background:#00ff95;
+    opacity:.04;
+    filter:blur(100px);
+    bottom:-150px;
+    right:-150px;
+    animation:float2 10s infinite ease-in-out;
+}
+
+@keyframes float1{
+    0%,100%{transform:translate(0,0)}
+    50%{transform:translate(100px,70px)}
+}
+
+@keyframes float2{
+    0%,100%{transform:translate(0,0)}
+    50%{transform:translate(-80px,-60px)}
+}
+
+/* HEADER */
+header{
+    position:sticky;
+    top:0;
+    z-index:999;
+    background:rgba(6,20,34,.92);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid #24445b;
+    padding:15px 5%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+}
+
+.logo span{
+    color:#00d9ff;
+    text-shadow:0 0 10px #00d9ff,0 0 25px #00d9ff;
+}
+
+.live{
+    color:#52e88a;
+    font-size:13px;
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+    50%{opacity:.45}
+}
+
+/* NAV */
+.nav{
+    position:sticky;
+    top:68px;
+    z-index:998;
+    background:rgba(7,24,39,.92);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid #18384e;
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    padding:10px;
+    overflow-x:auto;
+}
+
+.nav a{
+    color:#9db4c5;
+    text-decoration:none;
+    padding:9px 15px;
+    border-radius:20px;
+    font-size:12px;
+    white-space:nowrap;
+    transition:.3s;
+}
+
+.nav a:hover{
+    background:#123a50;
+    color:#00d9ff;
+}
+
+.container{
+    width:90%;
+    max-width:1350px;
+    margin:auto;
+}
+
+.slide{
+    min-height:calc(100vh - 120px);
+    padding:55px 0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.hero{
+    min-height:75vh;
+}
+
+.slideNumber{
+    display:inline-block;
+    margin-bottom:20px;
+    color:#00d9ff;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.hero h1{
+    font-size:52px;
+    line-height:1.1;
+    margin-bottom:20px;
+}
+
+.hero h1 span{
+    color:#00d9ff;
+    text-shadow:0 0 15px rgba(0,217,255,.5);
+}
+
+.hero p{
+    color:#a9bac9;
+    max-width:850px;
+    line-height:1.8;
+    font-size:16px;
+}
+
+/* SEARCH */
+.search{
+    margin-top:30px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+input{
+    width:280px;
+    padding:14px;
+    border-radius:9px;
+    border:1px solid #31506a;
+    background:#10263b;
+    color:white;
+    outline:none;
+    font-size:15px;
+}
+
+input:focus{
+    border-color:#00d9ff;
+    box-shadow:0 0 15px rgba(0,217,255,.2);
+}
+
+button{
+    padding:14px 20px;
+    border:none;
+    border-radius:9px;
+    background:linear-gradient(135deg,#00cbea,#007eaa);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 25px rgba(0,217,255,.25);
+}
+
+button:active{
+    transform:scale(.96);
+}
+
+.statusText{
+    margin-top:16px;
+    color:#91a8ba;
+}
+
+.loading{
+    color:#00d9ff;
+    animation:blink 1.2s infinite;
+}
+
+.error{
+    color:#ff727d;
+}
+
+@keyframes blink{
+    50%{opacity:.35}
+}
+
+/* TITLES */
+.sectionTitle{
+    font-size:34px;
+    margin-bottom:12px;
+}
+
+.sectionTitle span{
+    color:#00d9ff;
+}
+
+.sectionDescription{
+    color:#91a8ba;
+    margin-bottom:25px;
+    line-height:1.6;
+}
+
+/* CARDS */
+.card{
+    background:linear-gradient(145deg,rgba(15,39,60,.96),rgba(7,25,41,.96));
+    border:1px solid #1d4058;
+    border-radius:16px;
+    padding:22px;
+    position:relative;
+    overflow:hidden;
+    transition:.35s;
+}
+
+.card:before{
+    content:"";
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    background:#00d9ff;
+    opacity:.035;
+    right:-45px;
+    top:-45px;
+}
+
+.card:hover{
+    transform:translateY(-7px);
+    border-color:#00a8c7;
+    box-shadow:0 15px 35px rgba(0,0,0,.3);
+}
+
+.card h3{
+    color:#91a8ba;
+    font-size:13px;
+    margin-bottom:13px;
+}
+
+.locationCard{
+    margin-bottom:25px;
+}
+
+.locationCard p{
+    color:#a9bac9;
+    line-height:1.8;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:17px;
+}
+
+.aqiCard{
+    background:linear-gradient(135deg,#123e56,#092238);
+}
+
+.aqi{
+    font-size:60px;
+    font-weight:bold;
+}
+
+.badge{
+    display:inline-block;
+    margin-top:8px;
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.big{
+    font-size:38px;
+    font-weight:bold;
+}
+
+.unit{
+    color:#8198aa;
+    font-size:13px;
+}
+
+/* POLLUTANTS */
+.pollutants{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:15px;
+}
+
+.pollutants .card:nth-child(1){
+    border-top:3px solid #00d9ff;
+}
+
+.pollutants .card:nth-child(2){
+    border-top:3px solid #52e88a;
+}
+
+.pollutants .card:nth-child(3){
+    border-top:3px solid #ffd45c;
+}
+
+.pollutants .card:nth-child(4){
+    border-top:3px solid #ff8a5c;
+}
+
+.pollutants .card:nth-child(5){
+    border-top:3px solid #c77dff;
+}
+
+/* FORECAST */
+.forecastBox{
+    background:linear-gradient(145deg,#0d263c,#071c2e);
+    border:1px solid #1d4058;
+    border-radius:16px;
+    padding:20px;
+}
+
+.forecast{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding-bottom:10px;
+}
+
+.forecastCard{
+    min-width:125px;
+    background:#102d44;
+    border:1px solid #23475f;
+    border-radius:12px;
+    padding:15px 10px;
+    text-align:center;
+    transition:.3s;
+}
+
+.forecastCard:hover{
+    transform:translateY(-6px);
+    border-color:#00d9ff;
+}
+
+.forecastCard .time{
+    color:#91a8ba;
+    font-size:12px;
+}
+
+.forecastCard .number{
+    font-size:27px;
+    font-weight:bold;
+    margin:10px 0;
+}
+
+.forecastCard .pm{
+    color:#a9bac9;
+    font-size:10px;
+}
+
+/* CHART */
+.chart{
+    margin-top:25px;
+    height:360px;
+    background:#061a2a;
+    border:1px solid #163a51;
+    border-radius:12px;
+    padding:10px;
+}
+
+canvas{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+/* CONFIDENCE */
+.confidenceBox{
+    margin-top:22px;
+    display:grid;
+    grid-template-columns:180px 1fr;
+    gap:30px;
+    align-items:center;
+    background:linear-gradient(135deg,#102f43,#0a2032);
+    border:1px solid #24516b;
+    border-radius:16px;
+    padding:25px;
+}
+
+.confidenceCircle{
+    width:145px;
+    height:145px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:auto;
+    background:conic-gradient(
+        #00d9ff 0deg,
+        #00d9ff var(--confidence-angle),
+        #17384c var(--confidence-angle),
+        #17384c 360deg
+    );
+    position:relative;
+    box-shadow:0 0 30px rgba(0,217,255,.15);
+}
+
+.confidenceCircle:before{
+    content:"";
+    position:absolute;
+    width:112px;
+    height:112px;
+    border-radius:50%;
+    background:#0a2133;
+}
+
+.confidenceValue{
+    position:relative;
+    z-index:2;
+    color:#00d9ff;
+    font-size:27px;
+    font-weight:bold;
+}
+
+.confidenceText h2{
+    color:#00d9ff;
+    margin-bottom:10px;
+}
+
+.confidenceText p{
+    color:#9db1c1;
+    line-height:1.6;
+}
+
+.progress{
+    height:10px;
+    background:#17384c;
+    border-radius:20px;
+    margin-top:16px;
+    overflow:hidden;
+}
+
+.progressBar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#00a8c7,#00d9ff,#52e88a);
+    border-radius:20px;
+    transition:1.5s;
+}
+
+/* WARNING */
+.warning{
+    margin-top:22px;
+    padding:25px;
+    border-radius:16px;
+    border:1px solid #875f24;
+    background:linear-gradient(135deg,#2d2413,#21190d);
+}
+
+.warning h2{
+    color:#ffc45b;
+    margin-bottom:10px;
+}
+
+.warning p{
+    color:#d7c8aa;
+    line-height:1.7;
+}
+
+.safe{
+    border-color:#236743;
+    background:linear-gradient(135deg,#10271d,#092016);
+}
+
+.safe h2{
+    color:#55e58d;
+}
+
+/* ACTIONS */
+.recommendations{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.recommendations .card{
+    border-left:3px solid #00d9ff;
+}
+
+.recommendations p{
+    color:#a9bac9;
+    line-height:1.7;
+    font-size:14px;
+}
+
+/* INFO */
+.infoGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.infoCard{
+    text-align:center;
+    padding:30px 20px;
+}
+
+.infoIcon{
+    font-size:40px;
+    margin-bottom:15px;
+}
+
+.infoCard h3{
+    color:#fff;
+    font-size:18px;
+}
+
+.infoCard p{
+    color:#91a8ba;
+    line-height:1.6;
+    margin-top:10px;
+}
+
+/* FOOTER */
+footer{
+    text-align:center;
+    padding:50px 20px 30px;
+    color:#71889a;
+    font-size:13px;
+    border-top:1px solid #18364b;
+}
+
+footer b{
+    color:#00d9ff;
+}
+
+/* MOBILE */
+@media(max-width:1000px){
+
+    .grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .pollutants{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .hero h1{
+        font-size:40px;
+    }
+}
+
+@media(max-width:750px){
+
+    .slide{
+        min-height:auto;
+        padding:60px 0;
+    }
+
+    .confidenceBox{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+
+    .recommendations,
+    .infoGrid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:550px){
+
+    header{
+        padding:14px 4%;
+    }
+
+    .logo{
+        font-size:20px;
+    }
+
+    .live{
+        font-size:10px;
+    }
+
+    .grid,
+    .pollutants{
+        grid-template-columns:1fr;
+    }
+
+    .hero h1{
+        font-size:31px;
+    }
+
+    .hero p{
+        font-size:14px;
+    }
+
+    input,
+    button{
+        width:100%;
+    }
+
+    .sectionTitle{
+        font-size:27px;
+    }
+
+    .chart{
+        height:300px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🛡️ Aero<span>Shield</span></div>
+    <div class="live">● LIVE MONITORING</div>
+</header>
+
+<nav class="nav">
+    <a href="#home">🏠 Overview</a>
+    <a href="#status">🌍 Status</a>
+    <a href="#weather">🌦 Weather</a>
+    <a href="#pollution">🧪 Pollutants</a>
+    <a href="#forecastSection">📈 72H Forecast</a>
+    <a href="#warning">🚨 Warning</a>
+    <a href="#actions">🛡️ Actions</a>
+</nav>
+
+<div class="container">
+
+<!-- HOME -->
+<section id="home" class="slide hero">
+
+    <span class="slideNumber">01 / AEROSHIELD</span>
+
+    <h1>
+        AI-Powered Pollution
+        <span>Early Warning System</span>
+    </h1>
+
+    <p>
+        AeroShield monitors real-time environmental conditions
+        and provides hourly air-quality forecasts for the next
+        72 hours to support citizens and disaster-management
+        authorities.
+    </p>
+
+    <div class="search">
+
+        <input
+            id="city"
+            type="text"
+            value="Solapur"
+            placeholder="Enter city name"
+        >
+
+        <button onclick="loadData()">🔍 Analyze Location</button>
+
+        <button onclick="getLocation()">📍 My Location</button>
+
+        <button onclick="loadData()">🔄 Refresh</button>
+
+    </div>
+
+    <div id="message" class="statusText">
+        <span class="loading">⏳ Loading environmental data...</span>
+    </div>
+
+</section>
+
+<!-- STATUS -->
+<section id="status" class="slide">
+
+    <span class="slideNumber">02 / CURRENT STATUS</span>
+
+    <h2 class="sectionTitle">
+        🌍 Current <span>Environmental Status</span>
+    </h2>
+
+    <p class="sectionDescription">
+        Live environmental conditions for the selected location.
+    </p>
+
+    <div class="card locationCard">
+
+        <h3>📍 MONITORING LOCATION</h3>
+
+        <p id="locationInfo">
+            Loading location information...
+        </p>
+
+    </div>
+
+    <div class="grid">
+
+        <div class="card aqiCard">
+            <h3>AIR QUALITY INDEX</h3>
+
+            <div class="aqi" id="aqi">--</div>
+
+            <span id="aqiBadge" class="badge">
+                Loading
+            </span>
+        </div>
+
+        <div class="card">
+            <h3>🌫 PM2.5</h3>
+            <div class="big" id="pm25">--</div>
+            <span class="unit">µg/m³</span>
+        </div>
+
+        <div class="card">
+            <h3>🌫 PM10</h3>
+            <div class="big" id="pm10">--</div>
+            <span class="unit">µg/m³</span>
+        </div>
+
+        <div class="card">
+            <h3>🌡 TEMPERATURE</h3>
+            <div class="big" id="temperature">--</div>
+            <span class="unit">°C</span>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- WEATHER -->
+<section id="weather" class="slide">
+
+    <span class="slideNumber">03 / WEATHER</span>
+
+    <h2 class="sectionTitle">
+        🌦 Environmental <span>Conditions</span>
+    </h2>
+
+    <p class="sectionDescription">
+        Current weather parameters that influence pollution dispersion.
+    </p>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>💧 HUMIDITY</h3>
+            <div class="big" id="humidity">--</div>
+            <span class="unit">%</span>
+        </div>
+
+        <div class="card">
+            <h3>💨 WIND SPEED</h3>
+            <div class="big" id="wind">--</div>
+            <span class="unit">km/h</span>
+        </div>
+
+        <div class="card">
+            <h3>🌧 RAINFALL</h3>
+            <div class="big" id="rain">--</div>
+            <span class="unit">mm</span>
+        </div>
+
+        <div class="card">
+            <h3>🧭 WIND DIRECTION</h3>
+            <div class="big" id="windDirection">--</div>
+            <span class="unit">degrees</span>
+        </div>
+
+    </div>
+
+    <div class="infoGrid" style="margin-top:25px;">
+
+        <div class="card infoCard">
+            <div class="infoIcon">💨</div>
+            <h3>Wind Monitoring</h3>
+            <p>
+                Wind speed and direction help understand
+                how pollutants may disperse.
+            </p>
+        </div>
+
+        <div class="card infoCard">
+            <div class="infoIcon">💧</div>
+            <h3>Humidity</h3>
+            <p>
+                Humidity is monitored as an important
+                environmental parameter.
+            </p>
+        </div>
+
+        <div class="card infoCard">
+            <div class="infoIcon">🌧️</div>
+            <h3>Rainfall</h3>
+            <p>
+                Rainfall information provides additional
+                environmental context.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- POLLUTION -->
+<section id="pollution" class="slide">
+
+    <span class="slideNumber">04 / POLLUTION</span>
+
+    <h2 class="sectionTitle">
+        🧪 Pollutant <span>Monitoring</span>
+    </h2>
+
+    <p class="sectionDescription">
+        Real-time concentration of major air pollutants.
+    </p>
+
+    <div class="pollutants">
+
+        <div class="card">
+            <h3>PM2.5</h3>
+            <div class="big" id="p1">--</div>
+            <span class="unit">µg/m³</span>
+        </div>
+
+        <div class="card">
+            <h3>PM10</h3>
+            <div class="big" id="p2">--</div>
+            <span class="unit">µg/m³</span>
+        </div>
+
+        <div class="card">
+            <h3>CO</h3>
+            <div class="big" id="co">--</div>
+            <span class="unit">µg/m³</span>
+        </div>
+
+        <div class="card">
+            <h3>NO₂</h3>
+            <div class="big" id="no2">--</div>
+            <span class="unit">µg/m³</span>
+        </div>
+
+        <div class="card">
+            <h3>O₃</h3>
+            <div class="big" id="o3">--</div>
+            <span class="unit">µg/m³</span>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FORECAST -->
+<section id="forecastSection" class="slide">
+
+    <span class="slideNumber">05 / FORECAST</span>
+
+    <h2 class="sectionTitle">
+        📈 <span>72-Hour Pollution Forecast</span>
+    </h2>
+
+    <p class="sectionDescription">
+        Hour-by-hour AQI forecast for the selected location.
+    </p>
+
+    <div class="forecastBox">
+
+        <!-- FIXED: unique ID -->
+        <div id="forecastCards" class="forecast">
+            <div class="loading">
+                Loading 72-hour forecast...
+            </div>
+        </div>
+
+        <div class="chart">
+            <canvas id="chart"></canvas>
+        </div>
+
+    </div>
+
+    <div class="confidenceBox">
+
+        <div
+            id="confidenceCircle"
+            class="confidenceCircle"
+            style="--confidence-angle:0deg"
+        >
+
+            <div id="confidenceValue" class="confidenceValue">
+                0%
+            </div>
+
+        </div>
+
+        <div class="confidenceText">
+
+            <h2>🎯 Forecast Data Confidence</h2>
+
+            <p id="confidenceDescription">
+                Calculating forecast data completeness...
+            </p>
+
+            <div class="progress">
+                <div id="confidenceBar" class="progressBar"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- WARNING -->
+<section id="warning" class="slide">
+
+    <span class="slideNumber">06 / EARLY WARNING</span>
+
+    <h2 class="sectionTitle">
+        🚨 Pollution <span>Early Warning</span>
+    </h2>
+
+    <p class="sectionDescription">
+        AeroShield evaluates the available 72-hour AQI forecast
+        and highlights potential high-pollution periods.
+    </p>
+
+    <div id="warningBox" class="warning">
+
+        <h2>⏳ Pollution Analysis</h2>
+
+        <p>Waiting for environmental data...</p>
+
+    </div>
+
+    <div class="infoGrid" style="margin-top:25px;">
+
+        <div class="card infoCard">
+            <div class="infoIcon">🟢</div>
+            <h3>Good / Acceptable</h3>
+            <p>
+                Continue monitoring environmental
+                conditions normally.
+            </p>
+        </div>
+
+        <div class="card infoCard">
+            <div class="infoIcon">🟠</div>
+            <h3>Early Warning</h3>
+            <p>
+                Increased attention may be required
+                during predicted pollution periods.
+            </p>
+        </div>
+
+        <div class="card infoCard">
+            <div class="infoIcon">🔴</div>
+            <h3>High Pollution</h3>
+            <p>
+                Authorities and sensitive groups should
+                closely monitor predicted conditions.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ACTIONS -->
+<section id="actions" class="slide">
+
+    <span class="slideNumber">07 / RESPONSE</span>
+
+    <h2 class="sectionTitle">
+        🛡️ Recommended <span>Actions</span>
+    </h2>
+
+    <p class="sectionDescription">
+        Suggested actions based on changing air-quality conditions.
+    </p>
+
+    <div class="recommendations">
+
+        <div class="card">
+            <h3>👥 Citizens</h3>
+            <p>
+                Monitor AQI regularly. Reduce prolonged
+                outdoor activity when pollution levels
+                become unhealthy.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>🏥 Sensitive Groups</h3>
+            <p>
+                Children, elderly people and people with
+                respiratory concerns should take additional
+                precautions during poor air-quality periods.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>🏢 Authorities</h3>
+            <p>
+                Monitor predicted high-risk periods and
+                prepare suitable public-health and
+                pollution-control actions.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="card" style="margin-top:25px;text-align:center;">
+
+        <h2 style="color:#00d9ff;margin-bottom:10px;">
+            🛡️ AeroShield
+        </h2>
+
+        <p style="color:#91a8ba;line-height:1.7;">
+            Monitor → Forecast → Detect Risk → Alert → Respond
+        </p>
+
+    </div>
+
+</section>
+
+</div>
+
+<footer>
+
+    <b>AeroShield</b> © 2026
+
+    <br><br>
+
+    AI-Powered Pollution Early Warning System
+
+    <br><br>
+
+    Environmental forecast data: Open-Meteo
+
+</footer>
+
+<script>
+
+/* =====================================================
+   GLOBAL VARIABLES
+===================================================== */
+
+let forecastAQI = [];
+let forecastTimes = [];
+
+
+/* =====================================================
+   SAFE NUMBER
+===================================================== */
+
+function showValue(value, decimals = 1){
+
+    if(
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        !isFinite(Number(value))
+    ){
+        return "--";
+    }
+
+    return Number(value).toFixed(decimals);
+}
+
+
+/* =====================================================
+   HTML ESCAPE
+===================================================== */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+/* =====================================================
+   GET CITY COORDINATES
+===================================================== */
+
+async function getCoordinates(city){
+
+    const url =
+        "https://geocoding-api.open-meteo.com/v1/search" +
+        "?name=" + encodeURIComponent(city) +
+        "&count=1" +
+        "&language=en" +
+        "&format=json";
+
+    const response = await fetch(url);
+
+    if(!response.ok){
+        throw new Error("Location service unavailable.");
+    }
+
+    const data = await response.json();
+
+    if(!data.results || data.results.length === 0){
+        throw new Error("City not found.");
+    }
+
+    return data.results[0];
+}
+
+
+/* =====================================================
+   LOAD DATA
+===================================================== */
+
+async function loadData(){
+
+    const city =
+        document.getElementById("city").value.trim();
+
+    if(!city){
+        alert("Please enter a city name.");
+        return;
+    }
+
+    document.getElementById("message").innerHTML =
+        "<span class='loading'>⏳ Loading live environmental data...</span>";
+
+    try{
+
+        const place = await getCoordinates(city);
+
+        await getEnvironmentalData(
+            place.latitude,
+            place.longitude,
+            place.name,
+            place.country
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        document.getElementById("message").innerHTML =
+            "<span class='error'>❌ " +
+            escapeHTML(error.message) +
+            "</span>";
+    }
+}
+
+
+/* =====================================================
+   MY LOCATION
+===================================================== */
+
+function getLocation(){
+
+    if(!navigator.geolocation){
+
+        alert("Geolocation is not supported by this browser.");
+        return;
+    }
+
+    document.getElementById("message").innerHTML =
+        "<span class='loading'>📍 Detecting your location...</span>";
+
+    navigator.geolocation.getCurrentPosition(
+
+        async function(position){
+
+            try{
+
+                await getEnvironmentalData(
+                    position.coords.latitude,
+                    position.coords.longitude,
+                    "My Location",
+                    "GPS"
+                );
+
+            }catch(error){
+
+                document.getElementById("message").innerHTML =
+                    "<span class='error'>❌ " +
+                    escapeHTML(error.message) +
+                    "</span>";
+            }
+
+        },
+
+        function(){
+
+            document.getElementById("message").innerHTML =
+                "<span class='error'>❌ Location permission denied.</span>";
+
+        },
+
+        {
+            enableHighAccuracy:false,
+            timeout:10000,
+            maximumAge:300000
+        }
+    );
+}
+
+
+/* =====================================================
+   ENVIRONMENTAL DATA
+===================================================== */
+
+async function getEnvironmentalData(
+    latitude,
+    longitude,
+    city,
+    country
+){
+
+    /* WEATHER API */
+
+    const weatherURL =
+        "https://api.open-meteo.com/v1/forecast" +
+
+        "?latitude=" + encodeURIComponent(latitude) +
+        "&longitude=" + encodeURIComponent(longitude) +
+
+        "&current=" +
+        "temperature_2m," +
+        "relative_humidity_2m," +
+        "precipitation," +
+        "wind_speed_10m," +
+        "wind_direction_10m" +
+
+        "&hourly=" +
+        "temperature_2m," +
+        "relative_humidity_2m," +
+        "precipitation," +
+        "wind_speed_10m," +
+        "wind_direction_10m" +
+
+        "&forecast_days=4" +
+
+        "&wind_speed_unit=kmh" +
+
+        "&timezone=auto";
+
+
+    /* AIR QUALITY API */
+
+    const airURL =
+        "https://air-quality-api.open-meteo.com/v1/air-quality" +
+
+        "?latitude=" + encodeURIComponent(latitude) +
+        "&longitude=" + encodeURIComponent(longitude) +
+
+        "&current=" +
+        "pm10," +
+        "pm2_5," +
+        "carbon_monoxide," +
+        "nitrogen_dioxide," +
+        "ozone," +
+        "sulphur_dioxide," +
+        "us_aqi" +
+
+        "&hourly=" +
+        "pm10," +
+        "pm2_5," +
+        "carbon_monoxide," +
+        "nitrogen_dioxide," +
+        "ozone," +
+        "sulphur_dioxide," +
+        "us_aqi" +
+
+        "&forecast_days=4" +
+        "&timezone=auto";
+
+
+    const responses = await Promise.all([
+        fetch(weatherURL),
+        fetch(airURL)
+    ]);
+
+
+    if(!responses[0].ok){
+        throw new Error("Weather API error.");
+    }
+
+    if(!responses[1].ok){
+        throw new Error("Air Quality API error.");
+    }
+
+
+    const weather = await responses[0].json();
+    const air = await responses[1].json();
+
+
+    if(!weather.current){
+        throw new Error("Weather data unavailable.");
+    }
+
+    if(!air.current){
+        throw new Error("Air quality data unavailable.");
+    }
+
+
+    /* CURRENT WEATHER */
+
+    const current = weather.current;
+
+    document.getElementById("temperature").innerText =
+        showValue(current.temperature_2m,0);
+
+    document.getElementById("humidity").innerText =
+        showValue(current.relative_humidity_2m,0);
+
+    document.getElementById("wind").innerText =
+        showValue(current.wind_speed_10m,0);
+
+    document.getElementById("rain").innerText =
+        showValue(current.precipitation,1);
+
+    document.getElementById("windDirection").innerText =
+        showValue(current.wind_direction_10m,0);
+
+
+    /* CURRENT AIR QUALITY */
+
+    const ac = air.current;
+
+    const currentAQI = Number(ac.us_aqi);
+
+    document.getElementById("aqi").innerText =
+        showValue(currentAQI,0);
+
+    document.getElementById("pm25").innerText =
+        showValue(ac.pm2_5,1);
+
+    document.getElementById("pm10").innerText =
+        showValue(ac.pm10,1);
+
+    document.getElementById("p1").innerText =
+        showValue(ac.pm2_5,1);
+
+    document.getElementById("p2").innerText =
+        showValue(ac.pm10,1);
+
+    document.getElementById("co").innerText =
+        showValue(ac.carbon_monoxide,0);
+
+    document.getElementById("no2").innerText =
+        showValue(ac.nitrogen_dioxide,1);
+
+    document.getElementById("o3").innerText =
+        showValue(ac.ozone,1);
+
+
+    updateAQIStatus(currentAQI);
+
+
+    /* LOCATION */
+
+    document.getElementById("locationInfo").innerHTML =
+
+        "<b>" +
+        escapeHTML(city) +
+        ", " +
+        escapeHTML(country) +
+        "</b><br>" +
+
+        "Latitude: " +
+        Number(latitude).toFixed(4) +
+
+        " | Longitude: " +
+        Number(longitude).toFixed(4) +
+
+        "<br>Timezone: " +
+        escapeHTML(weather.timezone || "Auto");
+
+
+    document.getElementById("message").innerHTML =
+        "✅ Live environmental data loaded for <b>" +
+        escapeHTML(city) +
+        "</b>";
+
+
+    /* 72-HOUR FORECAST */
+
+    forecastAQI = [];
+    forecastTimes = [];
+
+
+    if(
+        air.hourly &&
+        Array.isArray(air.hourly.time) &&
+        Array.isArray(air.hourly.us_aqi)
+    ){
+
+        const length = Math.min(
+            73,
+            air.hourly.time.length,
+            air.hourly.us_aqi.length
+        );
+
+
+        for(let i=0;i<length;i++){
+
+            const value =
+                Number(air.hourly.us_aqi[i]);
+
+            if(isFinite(value)){
+
+                forecastAQI.push(value);
+                forecastTimes.push(air.hourly.time[i]);
+
+            }
+        }
+    }
+
+
+    createForecast();
+    drawChart();
+    createWarning();
+    calculateConfidence();
+}
+
+
+/* =====================================================
+   AQI INFORMATION
+===================================================== */
+
+function getAQIInfo(aqi){
+
+    if(!isFinite(aqi)){
+
+        return {
+            text:"NO DATA",
+            background:"#263746",
+            color:"#b5c4d0"
+        };
+    }
+
+
+    if(aqi <= 50){
+
+        return {
+            text:"GOOD",
+            background:"#123e29",
+            color:"#52e88a"
+        };
+    }
+
+
+    if(aqi <= 100){
+
+        return {
+            text:"MODERATE",
+            background:"#514111",
+            color:"#ffd45c"
+        };
+    }
+
+
+    if(aqi <= 150){
+
+        return {
+            text:"UNHEALTHY FOR SENSITIVE GROUPS",
+            background:"#59351a",
+            color:"#ffad5c"
+        };
+    }
+
+
+    if(aqi <= 200){
+
+        return {
+            text:"UNHEALTHY",
+            background:"#571d25",
+            color:"#ff727d"
+        };
+    }
+
+
+    if(aqi <= 300){
+
+        return {
+            text:"VERY UNHEALTHY",
+            background:"#42153c",
+            color:"#ff71df"
+        };
+    }
+
+
+    return {
+        text:"HAZARDOUS",
+        background:"#3d1010",
+        color:"#ff5555"
+    };
+}
+
+
+/* =====================================================
+   AQI STATUS
+===================================================== */
+
+function updateAQIStatus(aqi){
+
+    const badge =
+        document.getElementById("aqiBadge");
+
+    const info =
+        getAQIInfo(aqi);
+
+    badge.innerText =
+        info.text;
+
+    badge.style.background =
+        info.background;
+
+    badge.style.color =
+        info.color;
+
+    document.getElementById("aqi").style.color =
+        info.color;
+}
+
+
+/* =====================================================
+   FORECAST CARDS
+===================================================== */
+
+function createForecast(){
+
+    /*
+       IMPORTANT FIX:
+       We use forecastCards instead of forecast.
+       This prevents the complete section from
+       being deleted.
+    */
+
+    const box =
+        document.getElementById("forecastCards");
+
+    if(!box){
+        return;
+    }
+
+    box.innerHTML = "";
+
+
+    if(forecastAQI.length === 0){
+
+        box.innerHTML =
+            "<div class='error'>" +
+            "❌ 72-hour forecast unavailable." +
+            "</div>";
+
+        return;
+    }
+
+
+    for(
+        let i=0;
+        i<forecastAQI.length;
+        i+=6
+    ){
+
+        const value =
+            Math.round(forecastAQI[i]);
+
+        const info =
+            getAQIInfo(value);
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "forecastCard";
+
+        card.innerHTML =
+
+            "<div class='time'>" +
+
+            (
+                i === 0
+                ? "NOW"
+                : "+" + i + " H"
+            ) +
+
+            "</div>" +
+
+            "<div class='number' style='color:" +
+            info.color +
+            "'>" +
+
+            value +
+
+            "</div>" +
+
+            "<div class='pm'>" +
+            info.text +
+            "</div>";
+
+        box.appendChild(card);
+    }
+}
+
+
+/* =====================================================
+   WARNING
+===================================================== */
+
+function createWarning(){
+
+    const warning =
+        document.getElementById("warningBox");
+
+    if(!warning || forecastAQI.length === 0){
+        return;
+    }
+
+
+    const maximum =
+        Math.max(...forecastAQI);
+
+    const current =
+        forecastAQI[0];
+
+    const maxHour =
+        forecastAQI.indexOf(maximum);
+
+
+    if(maximum <= 100){
+
+        warning.className =
+            "warning safe";
+
+        warning.innerHTML =
+
+            "<h2>🟢 Air Quality Outlook: ACCEPTABLE</h2>" +
+
+            "<p>" +
+
+            "Current AQI: <b>" +
+            Math.round(current) +
+            "</b>. " +
+
+            "The available 72-hour forecast does not " +
+            "currently show AQI above 100. Continue " +
+            "monitoring local air-quality conditions." +
+
+            "</p>";
+
+    }
+
+    else if(maximum <= 150){
+
+        warning.className =
+            "warning";
+
+        warning.innerHTML =
+
+            "<h2>🟠 EARLY WARNING</h2>" +
+
+            "<p>" +
+
+            "Forecast AQI may reach <b>" +
+            Math.round(maximum) +
+            "</b> " +
+
+            "in approximately <b>" +
+            maxHour +
+            " hours</b>. " +
+
+            "Sensitive groups should consider reducing " +
+            "prolonged outdoor exposure during that period." +
+
+            "</p>";
+
+    }
+
+    else{
+
+        warning.className =
+            "warning";
+
+        warning.innerHTML =
+
+            "<h2>🔴 HIGH POLLUTION WARNING</h2>" +
+
+            "<p>" +
+
+            "A significant pollution episode may occur " +
+            "within the available 72-hour forecast. " +
+
+            "Maximum forecast AQI is approximately " +
+
+            "<b>" +
+            Math.round(maximum) +
+            "</b> " +
+
+            "at around <b>" +
+            maxHour +
+            " hours</b>. " +
+
+            "Authorities and sensitive groups should " +
+            "monitor conditions closely." +
+
+            "</p>";
+    }
+}
+
+
+/* =====================================================
+   CONFIDENCE
+===================================================== */
+
+function calculateConfidence(){
+
+    let score = 0;
+
+
+    const completeness =
+        Math.min(forecastAQI.length / 73,1);
+
+    score += completeness * 55;
+
+
+    const valid =
+        forecastAQI.filter(
+            value => isFinite(value)
+        ).length;
+
+    const validity =
+        forecastAQI.length > 0
+        ? valid / forecastAQI.length
+        : 0;
+
+    score += validity * 25;
+
+
+    const currentAQI =
+        Number(
+            document.getElementById("aqi").innerText
+        );
+
+    if(isFinite(currentAQI)){
+        score += 10;
+    }
+
+
+    const temperature =
+        document.getElementById("temperature").innerText;
+
+    if(temperature !== "--"){
+        score += 10;
+    }
+
+
+    score =
+        Math.round(
+            Math.min(100,score)
+        );
+
+
+    animateConfidence(score);
+}
+
+
+/* =====================================================
+   CONFIDENCE ANIMATION
+===================================================== */
+
+function animateConfidence(score){
+
+    const value =
+        document.getElementById("confidenceValue");
+
+    const bar =
+        document.getElementById("confidenceBar");
+
+    const circle =
+        document.getElementById("confidenceCircle");
+
+    const description =
+        document.getElementById("confidenceDescription");
+
+
+    circle.style.setProperty(
+        "--confidence-angle",
+        (score * 3.6) + "deg"
+    );
+
+
+    bar.style.width =
+        score + "%";
+
+
+    let current = 0;
+
+    const timer =
+        setInterval(function(){
+
+            current += 2;
+
+            if(current >= score){
+
+                current = score;
+
+                clearInterval(timer);
+            }
+
+            value.innerText =
+                current + "%";
+
+        },20);
+
+
+    if(score >= 90){
+
+        description.innerText =
+            "Excellent forecast data completeness. " +
+            "The available hourly data provides strong " +
+            "coverage across the requested 72-hour period.";
+
+    }
+
+    else if(score >= 75){
+
+        description.innerText =
+            "Good forecast data completeness with strong " +
+            "hourly coverage for upcoming air-quality conditions.";
+
+    }
+
+    else if(score >= 50){
+
+        description.innerText =
+            "Moderate confidence. Some forecast information " +
+            "may be incomplete. Continue monitoring updates.";
+
+    }
+
+    else{
+
+        description.innerText =
+            "Limited confidence because some environmental " +
+            "forecast information is unavailable.";
+    }
+}
+
+
+/* =====================================================
+   DRAW CHART
+===================================================== */
+
+function drawChart(){
+
+    const canvas =
+        document.getElementById("chart");
+
+    if(!canvas){
+        return;
+    }
+
+
+    const box =
+        canvas.parentElement;
+
+    const width =
+        box.clientWidth - 20;
+
+    const height =
+        box.clientHeight - 20;
+
+
+    if(width <= 0 || height <= 0){
+        return;
+    }
+
+
+    const ratio =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        width * ratio;
+
+    canvas.height =
+        height * ratio;
+
+    canvas.style.width =
+        width + "px";
+
+    canvas.style.height =
+        height + "px";
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+    );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if(forecastAQI.length < 2){
+
+        ctx.fillStyle =
+            "#91a8ba";
+
+        ctx.font =
+            "16px Arial";
+
+        ctx.fillText(
+            "Forecast chart unavailable",
+            20,
+            40
+        );
+
+        return;
+    }
+
+
+    const left = 55;
+    const right = 20;
+    const top = 25;
+    const bottom = 45;
+
+
+    const chartWidth =
+        width - left - right;
+
+    const chartHeight =
+        height - top - bottom;
+
+
+    const highest =
+        Math.max(...forecastAQI);
+
+
+    const maxAQI =
+        Math.max(
+            300,
+            Math.ceil(highest / 50) * 50
+        );
+
+
+    ctx.fillStyle =
+        "#061a2a";
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /* GRID */
+
+    const steps = 6;
+
+    ctx.font =
+        "11px Arial";
+
+
+    for(let i=0;i<=steps;i++){
+
+        const y =
+            top +
+            chartHeight -
+            (i / steps) * chartHeight;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(left,y);
+
+        ctx.lineTo(
+            width-right,
+            y
+        );
+
+
+        ctx.strokeStyle =
+            "#1c3448";
+
+        ctx.lineWidth = 1;
+
+        ctx.stroke();
+
+
+        const value =
+            Math.round(
+                (i / steps) * maxAQI
+            );
+
+
+        ctx.fillStyle =
+            "#8198aa";
+
+        ctx.fillText(
+            value,
+            10,
+            y + 4
+        );
+    }
+
+
+    function yFor(value){
+
+        return (
+            top +
+            chartHeight -
+            (value / maxAQI) *
+            chartHeight
+        );
+    }
+
+
+    /* AREA */
+
+    ctx.beginPath();
+
+    for(
+        let i=0;
+        i<forecastAQI.length;
+        i++
+    ){
+
+        const x =
+            left +
+            (
+                i /
+                (forecastAQI.length-1)
+            ) *
+            chartWidth;
+
+        const y =
+            yFor(forecastAQI[i]);
+
+
+        if(i===0){
+            ctx.moveTo(x,y);
+        }else{
+            ctx.lineTo(x,y);
+        }
+    }
+
+
+    ctx.lineTo(
+        width-right,
+        top+chartHeight
+    );
+
+    ctx.lineTo(
+        left,
+        top+chartHeight
+    );
+
+    ctx.closePath();
+
+    ctx.globalAlpha = .08;
+
+    ctx.fillStyle =
+        "#00d9ff";
+
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+
+
+    /* LINE */
+
+    ctx.beginPath();
+
+    for(
+        let i=0;
+        i<forecastAQI.length;
+        i++
+    ){
+
+        const x =
+            left +
+            (
+                i /
+                (forecastAQI.length-1)
+            ) *
+            chartWidth;
+
+        const y =
+            yFor(forecastAQI[i]);
+
+
+        if(i===0){
+            ctx.moveTo(x,y);
+        }else{
+            ctx.lineTo(x,y);
+        }
+    }
+
+
+    ctx.strokeStyle =
+        "#00d9ff";
+
+    ctx.lineWidth = 3;
+
+    ctx.shadowColor =
+        "#00d9ff";
+
+    ctx.shadowBlur = 9;
+
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+
+    /* POINTS */
+
+    for(
+        let i=0;
+        i<forecastAQI.length;
+        i+=6
+    ){
+
+        const value =
+            forecastAQI[i];
+
+        const x =
+            left +
+            (
+                i /
+                (forecastAQI.length-1)
+            ) *
+            chartWidth;
+
+        const y =
+            yFor(value);
+
+        const info =
+            getAQIInfo(value);
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            5,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle =
+            info.color;
+
+        ctx.shadowColor =
+            info.color;
+
+        ctx.shadowBlur = 12;
+
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+
+
+        /* VALUE */
+
+        ctx.fillStyle =
+            "#ffffff";
+
+        ctx.font =
+            "11px Arial";
+
+        ctx.fillText(
+            Math.round(value),
+            x-10,
+            y-12
+        );
+
+
+        /* TIME */
+
+        ctx.fillStyle =
+            "#8198aa";
+
+        ctx.fillText(
+            i===0
+            ? "NOW"
+            : "+" + i + "h",
+            x-12,
+            height-15
+        );
+    }
+
+
+    /* AXIS */
+
+    ctx.strokeStyle =
+        "#426078";
+
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+
+    ctx.moveTo(left,top);
+
+    ctx.lineTo(
+        left,
+        top+chartHeight
+    );
+
+    ctx.lineTo(
+        width-right,
+        top+chartHeight
+    );
+
+    ctx.stroke();
+
+
+    ctx.fillStyle =
+        "#91a8ba";
+
+    ctx.font =
+        "12px Arial";
+
+    ctx.fillText(
+        "AQI",
+        15,
+        18
+    );
+}
+
+
+/* =====================================================
+   RESIZE
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    function(){
+
+        if(forecastAQI.length > 1){
+            drawChart();
+        }
+
+    }
+);
+
+
+/* =====================================================
+   ENTER KEY
+===================================================== */
+
+document
+.getElementById("city")
+.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Enter"){
+            loadData();
+        }
+
+    }
+);
+
+
+/* =====================================================
+   AUTO LOAD
+===================================================== */
+
+window.addEventListener(
+    "load",
+    function(){
+        loadData();
+    }
+);
+
+</script>
+
+</body>
+</html>
